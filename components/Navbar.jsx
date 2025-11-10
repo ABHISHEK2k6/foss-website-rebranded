@@ -1,21 +1,26 @@
 'use client';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../app/globals.css";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 50;
+      setScrolled(isScrolled);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <>
-      {/* full-page background behind everything */}
-      <div className="fixed inset-0 -z-10 bg-black">
-        <div
-          className="w-full h-full bg-center bg-no-repeat bg-cover"
-          style={{ backgroundImage: "url('/galaxy.jpg')" }}
-        />
-      </div>
-
-      <nav className="bg-transparent">
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        scrolled ? 'bg-black/30 backdrop-blur-lg border-b border-white/20 shadow-lg' : 'bg-transparent'
+      }`}>
         <ul className="flex flex-row justify-between items-center p-4 text-white">
           <li className="flex-shrink-0">
             <h1 className="font-bold text-4xl">Foss</h1>
@@ -51,7 +56,7 @@ export default function Navbar() {
 
         {/* Mobile dropdown */}
         {open && (
-          <div className="md:hidden border-t border-white/10 bg-black/40 backdrop-blur-sm text-white">
+          <div className="md:hidden absolute top-full left-0 right-0 border-t border-white/20 bg-black/50 backdrop-blur-lg text-white shadow-lg">
             <ul className="px-4 py-3 space-y-2">
               <li><a href="#" className="block py-2" onClick={() => setOpen(false)}>Home</a></li>
               <li><a href="#" className="block py-2" onClick={() => setOpen(false)}>About</a></li>
