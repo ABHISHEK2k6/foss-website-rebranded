@@ -18,12 +18,12 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 w-full max-w-full ${
         scrolled ? 'bg-black/30 backdrop-blur-lg border-b border-white/20 shadow-lg' : 'bg-transparent'
       }`}>
-        <ul className="flex flex-row justify-between items-center p-4 text-white">
+        <ul className="flex flex-row justify-between items-center p-4 text-white w-full max-w-full">
           <li className="flex-shrink-0">
-            <h1 className="font-bold text-4xl">Foss</h1>
+            <h1 className="font-bold text-2xl sm:text-3xl md:text-4xl break-words">Foss</h1>
           </li>
           <li className="flex items-center">
             {/* Desktop links (unchanged) */}

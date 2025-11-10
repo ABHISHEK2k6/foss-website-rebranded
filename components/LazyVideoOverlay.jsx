@@ -9,17 +9,30 @@ export default function LazyVideoOverlay({
     const videoRef = useRef(null);
     const [isVisible, setIsVisible] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
-    // Load video immediately when component mounts
+    // Detect mobile device
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+        };
+        
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    // Load video with mobile optimization
     useEffect(() => {
         const video = videoRef.current;
         if (!video) return;
 
-        video.preload = 'auto';
+        // Mobile optimization
+        video.preload = isMobile ? 'none' : 'metadata';
         video.playsInline = true;
         video.muted = true;
         video.loop = true;
-        video.autoplay = false; // Don't autoplay yet
+        video.autoplay = false;
 
         const handleCanPlay = () => {
             setIsLoaded(true);
@@ -32,26 +45,32 @@ export default function LazyVideoOverlay({
         video.addEventListener('canplay', handleCanPlay);
         video.addEventListener('loadeddata', handleLoadedData);
 
-        // Start loading the video immediately
-        video.load();
+        // Only load video immediately on desktop
+        if (!isMobile) {
+            video.load();
+        }
 
         return () => {
             video.removeEventListener('canplay', handleCanPlay);
             video.removeEventListener('loadeddata', handleLoadedData);
         };
-    }, [videoSrc]); // Load when component mounts or video source changes
+    }, [videoSrc, isMobile]);
 
-    // Handle visibility for play/pause
+    // Handle visibility for play/pause with mobile optimization
     useEffect(() => {
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting && trigger) {
                     setIsVisible(true);
+                    // Load video on mobile only when visible
+                    if (isMobile && videoRef.current) {
+                        videoRef.current.load();
+                    }
                 } else {
                     setIsVisible(false);
                 }
             },
-            { threshold: 0.1 }
+            { threshold: isMobile ? 0.2 : 0.1 }
         );
 
         const currentRef = videoRef.current?.parentElement;
@@ -64,7 +83,7 @@ export default function LazyVideoOverlay({
                 observer.unobserve(currentRef);
             }
         };
-    }, [trigger]);
+    }, [trigger, isMobile]);
 
     // Play/pause based on visibility
     useEffect(() => {
@@ -72,25 +91,32 @@ export default function LazyVideoOverlay({
         if (!video || !isLoaded) return;
 
         if (isVisible && video.paused) {
+            // Reduce playback rate on mobile for better performance
+            if (isMobile) {
+                video.playbackRate = 0.75;
+            }
             video.play().catch(console.error);
         } else if (!isVisible && !video.paused) {
             video.pause();
         }
-    }, [isVisible, isLoaded]);
+    }, [isVisible, isLoaded, isMobile]);
 
     return (
         <video
             ref={videoRef}
             className="absolute inset-0 w-full h-full object-cover video-overlay"
             style={{ 
-                opacity: isVisible && isLoaded ? opacity : 0,
+                opacity: isVisible && isLoaded ? (isMobile ? opacity * 0.6 : opacity) : 0,
                 transition: 'opacity 1s ease-in-out',
-                filter: 'contrast(1.1) saturate(0.2) brightness(0.5) grayscale(0.5)'
+                filter: isMobile 
+                    ? 'contrast(1.0) saturate(0.1) brightness(0.4) grayscale(0.7)' 
+                    : 'contrast(1.1) saturate(0.2) brightness(0.5) grayscale(0.5)',
+                transform: isMobile ? 'scale(1.05)' : 'none'
             }}
             muted
             loop
             playsInline
-            preload="auto"
+            preload={isMobile ? 'none' : 'metadata'}
         >
             <source src={videoSrc} type="video/mp4" />
             Your browser does not support the video tag.

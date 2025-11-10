@@ -10,6 +10,18 @@ export default function VideoBackground({
     const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
     const [isLoaded, setIsLoaded] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Detect mobile device
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+        };
+        
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     useEffect(() => {
         const video = videoRef.current;
@@ -19,11 +31,17 @@ export default function VideoBackground({
         setIsLoaded(false);
         setIsPlaying(false);
 
-        // Configure video for optimal loading
-        video.preload = 'auto';
+        // Mobile optimization: reduce quality and preload behavior
+        if (isMobile) {
+            video.preload = 'metadata';
+            video.style.objectPosition = 'center center';
+        } else {
+            video.preload = 'auto';
+        }
+        
         video.playsInline = true;
         video.muted = true;
-        video.loop = videoSources.length === 1; // Loop if single video
+        video.loop = videoSources.length === 1;
         video.autoplay = true;
 
         const handleCanPlay = () => {
@@ -31,7 +49,11 @@ export default function VideoBackground({
         };
 
         const handleLoadedData = () => {
-            // Ensure video plays after loading
+            // Optimize playback for mobile
+            if (isMobile) {
+                video.playbackRate = 0.75; // Slightly slower on mobile
+            }
+            
             const playPromise = video.play();
             if (playPromise !== undefined) {
                 playPromise
@@ -46,7 +68,6 @@ export default function VideoBackground({
 
         const handleEnded = () => {
             if (videoSources.length > 1) {
-                // Switch to next video only if multiple videos
                 setCurrentVideoIndex((prev) => (prev + 1) % videoSources.length);
             }
         };
@@ -76,33 +97,40 @@ export default function VideoBackground({
             video.removeEventListener('play', handlePlay);
             video.removeEventListener('pause', handlePause);
         };
-    }, [videoSources, currentVideoIndex]);
+    }, [videoSources, currentVideoIndex, isMobile]);
 
     return (
         <>
-            {/* Fallback static background */}
+            {/* Optimized fallback static background with faster loading */}
             <div 
-                className="absolute inset-0 -z-20 bg-black"
+                className="absolute inset-0 -z-20 bg-gradient-to-br from-gray-900 via-black to-gray-800"
             >
                 <div
-                    className="w-full h-full bg-center bg-no-repeat bg-cover"
-                    style={{ backgroundImage: "url('/galaxy.jpg')" }}
+                    className="w-full h-full bg-center bg-no-repeat bg-cover opacity-80"
+                    style={{ 
+                        backgroundImage: "url('/galaxy.jpg')",
+                        backgroundSize: isMobile ? 'cover' : 'cover',
+                        backgroundPosition: isMobile ? 'center center' : 'center center'
+                    }}
                 />
             </div>
 
-            {/* Video overlay */}
+            {/* Optimized video overlay */}
             <video
                 ref={videoRef}
                 key={`${currentVideoIndex}-${videoSources[currentVideoIndex]}`}
                 className={`absolute inset-0 -z-10 w-full h-full object-cover transition-opacity duration-1000 ${className}`}
                 style={{ 
-                    opacity: isLoaded ? opacity : 0,
-                    filter: 'contrast(1.2) saturate(0.3) brightness(0.6) grayscale(0.4)'
+                    opacity: isLoaded ? (isMobile ? opacity * 0.7 : opacity) : 0,
+                    filter: isMobile 
+                        ? 'contrast(1.1) saturate(0.2) brightness(0.5) grayscale(0.6)' 
+                        : 'contrast(1.2) saturate(0.3) brightness(0.6) grayscale(0.4)',
+                    transform: isMobile ? 'scale(1.05)' : 'none'
                 }}
                 muted
                 playsInline
                 autoPlay
-                preload="auto"
+                preload={isMobile ? 'metadata' : 'auto'}
                 loop={videoSources.length === 1}
             >
                 <source src={videoSources[currentVideoIndex]} type="video/mp4" />
