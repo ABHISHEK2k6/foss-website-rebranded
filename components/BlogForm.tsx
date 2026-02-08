@@ -2,6 +2,7 @@
 
 import { useState, FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface BlogFormProps {
   blogId?: string;
@@ -36,35 +37,35 @@ export default function BlogForm({ blogId }: BlogFormProps) {
   });
 
   useEffect(() => {
+    const fetchBlog = async () => {
+      try {
+        const response = await fetch(`/api/blogs/${blogId}`);
+        const data = await response.json();
+        if (data.success) {
+          const blog = data.data;
+          setFormData({
+            title: blog.title,
+            slug: blog.slug,
+            content: blog.content,
+            excerpt: blog.excerpt,
+            author: blog.author,
+            coverImage: blog.coverImage || '',
+            tags: blog.tags.join(', '),
+            published: blog.published,
+          });
+          if (blog.coverImage) {
+            setImagePreview(blog.coverImage);
+          }
+        }
+      } catch {
+        setError('Failed to fetch blog');
+      }
+    };
+
     if (blogId) {
       fetchBlog();
     }
   }, [blogId]);
-
-  const fetchBlog = async () => {
-    try {
-      const response = await fetch(`/api/blogs/${blogId}`);
-      const data = await response.json();
-      if (data.success) {
-        const blog = data.data;
-        setFormData({
-          title: blog.title,
-          slug: blog.slug,
-          content: blog.content,
-          excerpt: blog.excerpt,
-          author: blog.author,
-          coverImage: blog.coverImage || '',
-          tags: blog.tags.join(', '),
-          published: blog.published,
-        });
-        if (blog.coverImage) {
-          setImagePreview(blog.coverImage);
-        }
-      }
-    } catch (error) {
-      setError('Failed to fetch blog');
-    }
-  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -104,7 +105,7 @@ export default function BlogForm({ blogId }: BlogFormProps) {
       } else {
         setError(data.error || 'Failed to upload image');
       }
-    } catch (error) {
+    } catch {
       setError('Failed to upload image');
     } finally {
       setUploading(false);
@@ -166,7 +167,7 @@ export default function BlogForm({ blogId }: BlogFormProps) {
       } else {
         setError(data.error);
       }
-    } catch (error) {
+    } catch {
       setError('Failed to save blog');
     } finally {
       setLoading(false);
@@ -229,9 +230,11 @@ export default function BlogForm({ blogId }: BlogFormProps) {
                 
                 {imagePreview && (
                   <div className="mb-4 relative">
-                    <img
+                    <Image
                       src={imagePreview}
                       alt="Cover preview"
+                      width={600}
+                      height={256}
                       className="w-full max-h-64 object-cover rounded-md border border-gray-300"
                     />
                     <button

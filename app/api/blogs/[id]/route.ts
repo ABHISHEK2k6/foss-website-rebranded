@@ -33,9 +33,9 @@ export async function GET(
     }
 
     return NextResponse.json({ success: true, data: blog });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: 'Failed to update blog' },
       { status: 500 }
     );
   }
@@ -74,9 +74,9 @@ export async function PUT(
     }
 
     return NextResponse.json({ success: true, data: blog });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: 'Failed to update blog' },
       { status: 400 }
     );
   }
@@ -110,9 +110,9 @@ export async function DELETE(
     }
 
     return NextResponse.json({ success: true, data: {} });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: 'Failed to delete blog' },
       { status: 500 }
     );
   }

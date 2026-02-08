@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
 import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import Navbar from '@/components/Navbar';
@@ -39,12 +38,25 @@ async function getBlog(slug: string): Promise<Blog | null> {
 
 // Generate static paths for all blogs
 export async function generateStaticParams() {
+  // During build time, skip static generation and rely on ISR
+  if (process.env.NODE_ENV === 'production') {
+    return [];
+  }
+  
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/blogs`);
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3002';
+    const response = await fetch(`${baseUrl}/api/blogs`, {
+      cache: 'no-store'
+    });
+    
+    if (!response.ok) {
+      console.log('Failed to fetch blogs for static generation');
+      return [];
+    }
+    
     const data = await response.json();
     
-    if (data.success) {
+    if (data.success && Array.isArray(data.data)) {
       return data.data.map((blog: Blog) => ({
         slug: blog.slug,
       }));
@@ -104,25 +116,25 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
               <div className="prose prose-invert prose-lg max-w-none">
                 <ReactMarkdown
                   components={{
-                    h1: ({ node, ...props }) => (
+                    h1: ({ ...props }) => (
                       <h1 className="text-3xl md:text-4xl font-bold mt-8 mb-4 text-white" {...props} />
                     ),
-                    h2: ({ node, ...props }) => (
+                    h2: ({ ...props }) => (
                       <h2 className="text-2xl md:text-3xl font-bold mt-6 mb-3 text-white" {...props} />
                     ),
-                    h3: ({ node, ...props }) => (
+                    h3: ({ ...props }) => (
                       <h3 className="text-xl md:text-2xl font-bold mt-4 mb-2 text-white" {...props} />
                     ),
-                    p: ({ node, ...props }) => (
+                    p: ({ ...props }) => (
                       <p className="mb-4 leading-relaxed text-gray-300" {...props} />
                     ),
-                    ul: ({ node, ...props }) => (
+                    ul: ({ ...props }) => (
                       <ul className="list-disc list-inside mb-4 space-y-2 text-gray-300" {...props} />
                     ),
-                    ol: ({ node, ...props }) => (
+                    ol: ({ ...props }) => (
                       <ol className="list-decimal list-inside mb-4 space-y-2 text-gray-300" {...props} />
                     ),
-                    code: ({ node, inline, ...props }: any) =>
+                    code: ({ inline, ...props }: { inline?: boolean } & React.HTMLProps<HTMLElement>) =>
                       inline ? (
                         <code
                           className="bg-white/10 text-white px-2 py-0.5 rounded text-sm font-mono border border-white/20"
@@ -134,23 +146,28 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
                           {...props}
                         />
                       ),
-                    a: ({ node, ...props }) => (
+                    a: ({ ...props }) => (
                       <a
                         className="text-blue-400 hover:text-blue-300 underline"
                         {...props}
                       />
                     ),
-                    blockquote: ({ node, ...props }) => (
+                    blockquote: ({ ...props }) => (
                       <blockquote
                         className="border-l-4 border-white/30 pl-4 italic my-4 text-gray-400"
                         {...props}
                       />
                     ),
-                    img: ({ node, ...props }) => (
-                      <img
-                        className="rounded-lg my-6 border border-white/20"
-                        {...props}
-                      />
+                    img: ({ src, alt }) => (
+                      src && typeof src === 'string' && (
+                        <Image
+                          src={src}
+                          alt={alt || 'Blog image'}
+                          width={800}
+                          height={400}
+                          className="rounded-lg my-6 border border-white/20"
+                        />
+                      )
                     ),
                   }}
                 >

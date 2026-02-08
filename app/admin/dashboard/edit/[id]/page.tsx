@@ -1,5 +1,6 @@
 import BlogForm from '@/components/BlogForm';
 
-export default function EditBlogPage({ params }: { params: { id: string } }) {
-  return <BlogForm blogId={params.id} />;
+export default async function EditBlogPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <BlogForm blogId={id} />;
 }

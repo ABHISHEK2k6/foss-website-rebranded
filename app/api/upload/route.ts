@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     const uploadDir = path.join(process.cwd(), 'public', 'uploads');
     try {
       await mkdir(uploadDir, { recursive: true });
-    } catch (error) {
+    } catch {
       // Directory might already exist, continue
     }
 
@@ -70,10 +70,10 @@ export async function POST(request: NextRequest) {
       success: true,
       url,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Upload error:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to upload file' },
+      { success: false, error: 'Failed to upload file' },
       { status: 500 }
     );
   }

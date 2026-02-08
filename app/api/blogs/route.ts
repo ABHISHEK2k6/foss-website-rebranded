@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const tag = searchParams.get('tag') || '';
     const showAll = searchParams.get('showAll') === 'true';
 
-    let query: any = {};
+    const query: Record<string, unknown> = {};
 
     // Only show all blogs (including unpublished) if showAll=true AND user is admin
     // Otherwise, only show published blogs
@@ -55,9 +55,9 @@ export async function GET(request: NextRequest) {
         pages: Math.ceil(total / limit),
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: 'Failed to fetch blogs' },
       { status: 500 }
     );
   }
@@ -84,9 +84,9 @@ export async function POST(request: NextRequest) {
       { success: true, data: blog },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: 'Failed to create blog' },
       { status: 400 }
     );
   }

@@ -32,7 +32,7 @@ export default function DashboardPage() {
       } else {
         setError(data.error);
       }
-    } catch (error) {
+    } catch {
       setError('Failed to fetch blogs');
     } finally {
       setLoading(false);
@@ -52,7 +52,7 @@ export default function DashboardPage() {
       } else {
         alert('Failed to delete blog');
       }
-    } catch (error) {
+    } catch {
       alert('Failed to delete blog');
     }
   };
@@ -70,7 +70,7 @@ export default function DashboardPage() {
       } else {
         alert('Failed to update blog');
       }
-    } catch (error) {
+    } catch {
       alert('Failed to update blog');
     }
   };
