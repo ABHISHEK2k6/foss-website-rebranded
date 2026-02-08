@@ -1,5 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import "../app/globals.css";
 
 export default function Navbar() {
@@ -21,18 +23,27 @@ export default function Navbar() {
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 w-full max-w-full ${
         scrolled ? 'bg-black/30 backdrop-blur-lg border-b border-white/20 shadow-lg' : 'bg-transparent'
       }`}>
-        <ul className="flex flex-row justify-between items-center p-4 text-white w-full max-w-full">
+        <ul className="flex flex-row justify-between items-start py-3 px-4 text-white w-full max-w-full">
           <li className="flex-shrink-0">
-            <h1 className="font-bold text-2xl sm:text-3xl md:text-4xl break-words">Foss</h1>
+            <Link href="/">
+              <Image 
+                src="/logo.png" 
+                alt="FOSS Logo" 
+                width={140} 
+                height={50}
+                className="cursor-pointer hover:opacity-80 transition-opacity"
+                priority
+              />
+            </Link>
           </li>
-          <li className="flex items-center">
+          <li className="flex items-start pt-10">
             {/* Desktop links (unchanged) */}
             <div className="hidden md:flex flex-row gap-8">
-              <a href="#" className="text-lg">Home</a>
-              <a href="#" className="text-lg">About</a>
-              <a href="#" className="text-lg">Achievements</a>
-              <a href="#" className="text-lg">Team</a>
-              <a href="#" className="text-lg">Contact</a>
+              <a href="/" className="text-lg hover:text-gray-300 transition-colors">Home</a>
+              <a href="#about" className="text-lg hover:text-gray-300 transition-colors">About</a>
+              <a href="/blogs" className="text-lg hover:text-gray-300 transition-colors">Blog</a>
+              <a href="#team" className="text-lg hover:text-gray-300 transition-colors">Team</a>
+              <a href="#contact" className="text-lg hover:text-gray-300 transition-colors">Contact</a>
             </div>
 
             {/* Mobile menu button */}
@@ -58,11 +69,11 @@ export default function Navbar() {
         {open && (
           <div className="md:hidden absolute top-full left-0 right-0 border-t border-white/20 bg-black/50 backdrop-blur-lg text-white shadow-lg">
             <ul className="px-4 py-3 space-y-2">
-              <li><a href="#" className="block py-2" onClick={() => setOpen(false)}>Home</a></li>
-              <li><a href="#" className="block py-2" onClick={() => setOpen(false)}>About</a></li>
-              <li><a href="#" className="block py-2" onClick={() => setOpen(false)}>Achievements</a></li>
-              <li><a href="#" className="block py-2" onClick={() => setOpen(false)}>Team</a></li>
-              <li><a href="#" className="block py-2" onClick={() => setOpen(false)}>Contact</a></li>
+              <li><a href="/" className="block py-2 hover:text-gray-300 transition-colors" onClick={() => setOpen(false)}>Home</a></li>
+              <li><a href="#about" className="block py-2 hover:text-gray-300 transition-colors" onClick={() => setOpen(false)}>About</a></li>
+              <li><a href="/blogs" className="block py-2 hover:text-gray-300 transition-colors" onClick={() => setOpen(false)}>Blog</a></li>
+              <li><a href="#team" className="block py-2 hover:text-gray-300 transition-colors" onClick={() => setOpen(false)}>Team</a></li>
+              <li><a href="#contact" className="block py-2 hover:text-gray-300 transition-colors" onClick={() => setOpen(false)}>Contact</a></li>
             </ul>
           </div>
         )}

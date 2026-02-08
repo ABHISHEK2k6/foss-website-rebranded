@@ -3,8 +3,9 @@ import './globals.css';
 export const metadata = {
   title: 'FOSS UCEK',
   description: 'Free and Open Source Software - University College of Engineering Kariyavattom',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
 }
+
+export const viewport = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no';
 
 export default function RootLayout({
   children,
@@ -13,9 +14,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="overflow-x-hidden">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-      </head>
       <body className="overflow-x-hidden w-full max-w-full relative">
         {/* Global Background Image */}
         <div 
