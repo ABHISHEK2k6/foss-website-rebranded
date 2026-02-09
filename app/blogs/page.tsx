@@ -2,7 +2,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ClientBlogCard from '@/components/ClientBlogCard';
 
-export const revalidate = 60; // Revalidate every 60 seconds
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 interface Blog {
   _id: string;
@@ -17,12 +18,24 @@ interface Blog {
 
 async function getBlogs(): Promise<Blog[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const isDev = process.env.NODE_ENV === 'development';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (
+      process.env.NODE_ENV === 'production' 
+        ? (process.env.VERCEL_URL 
+          ? `https://${process.env.VERCEL_URL}` 
+          : 'https://foss-website-rebranded.vercel.app')
+        : 'http://localhost:3002'
+    );
+    
     const response = await fetch(`${baseUrl}/api/blogs`, {
-      cache: isDev ? 'no-store' : 'force-cache',
-      next: { revalidate: isDev ? 0 : 60 }
+      cache: 'no-store',
+      next: { revalidate: 0 }
     });
+    
+    if (!response.ok) {
+      console.error('Failed to fetch blogs:', response.status, response.statusText);
+      return [];
+    }
+    
     const data = await response.json();
     return data.success ? data.data : [];
   } catch (error) {

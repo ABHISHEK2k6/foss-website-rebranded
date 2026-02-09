@@ -54,6 +54,10 @@ export async function GET(request: NextRequest) {
         total,
         pages: Math.ceil(total / limit),
       },
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+      },
     });
   } catch (error: unknown) {
     return NextResponse.json(

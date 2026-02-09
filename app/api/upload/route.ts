@@ -4,6 +4,36 @@ import { authOptions } from '@/lib/auth';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 
+// Upload to Cloudinary
+async function uploadToCloudinary(file: File): Promise<string> {
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = process.env.CLOUDINARY_UPLOAD_PRESET;
+
+  if (!cloudName || !uploadPreset) {
+    throw new Error('Cloudinary configuration missing');
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', uploadPreset);
+  formData.append('folder', 'foss-blog');
+
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+    {
+      method: 'POST',
+      body: formData,
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Cloudinary upload failed');
+  }
+
+  const data = await response.json();
+  return data.secure_url;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -43,28 +73,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    let url: string;
 
-    // Create unique filename
-    const timestamp = Date.now();
-    const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const filename = `${timestamp}-${originalName}`;
+    // Use Cloudinary in production, local storage in development
+    const useCloudinary = process.env.NODE_ENV === 'production' || process.env.USE_CLOUDINARY === 'true';
 
-    // Create uploads directory if it doesn't exist
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch {
-      // Directory might already exist, continue
+    if (useCloudinary) {
+      // Upload to Cloudinary
+      url = await uploadToCloudinary(file);
+    } else {
+      // Local file upload for development
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      // Create unique filename
+      const timestamp = Date.now();
+      const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const filename = `${timestamp}-${originalName}`;
+
+      // Create uploads directory if it doesn't exist
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+      try {
+        await mkdir(uploadDir, { recursive: true });
+      } catch {
+        // Directory might already exist, continue
+      }
+
+      // Save file
+      const filepath = path.join(uploadDir, filename);
+      await writeFile(filepath, buffer);
+
+      // Return public URL
+      url = `/uploads/${filename}`;
     }
-
-    // Save file
-    const filepath = path.join(uploadDir, filename);
-    await writeFile(filepath, buffer);
-
-    // Return public URL
-    const url = `/uploads/${filename}`;
 
     return NextResponse.json({
       success: true,

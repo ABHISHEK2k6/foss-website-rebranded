@@ -32,7 +32,11 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ success: true, data: blog });
+    return NextResponse.json({ success: true, data: blog }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+      },
+    });
   } catch (error: unknown) {
     return NextResponse.json(
       { success: false, error: 'Failed to fetch blog' },
