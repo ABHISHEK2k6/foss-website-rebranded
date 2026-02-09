@@ -77,30 +77,30 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-xl">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
+    <div className="min-h-screen bg-black text-white">
+      <nav className="bg-white/5 backdrop-blur-sm border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 sm:h-16 gap-4 sm:gap-0">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold">Admin Dashboard</h1>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">Admin Dashboard</h1>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
               <Link
                 href="/admin/dashboard/new"
-                className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+                className="flex-1 sm:flex-none bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all text-center text-sm sm:text-base"
               >
                 New Blog Post
               </Link>
               <button
                 onClick={() => signOut({ callbackUrl: '/admin/login' })}
-                className="text-gray-700 hover:text-gray-900"
+                className="flex-1 sm:flex-none text-gray-300 hover:text-white border border-white/20 px-4 py-2 rounded-lg hover:bg-white/10 transition-all text-sm sm:text-base"
               >
                 Sign Out
               </button>
@@ -111,35 +111,35 @@ export default function DashboardPage() {
 
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         {error && (
-          <div className="rounded-md bg-red-50 p-4 mb-4">
-            <p className="text-sm text-red-800">{error}</p>
+          <div className="rounded-md bg-red-500/20 border border-red-500/50 p-4 mb-4 mx-4 sm:mx-0">
+            <p className="text-sm text-red-200">{error}</p>
           </div>
         )}
 
         <div className="px-4 py-6 sm:px-0">
-          <div className="bg-white shadow overflow-hidden sm:rounded-md">
-            <ul className="divide-y divide-gray-200">
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 shadow-xl overflow-hidden sm:rounded-lg">
+            <ul className="divide-y divide-white/10">
               {blogs.length === 0 ? (
-                <li className="px-6 py-4 text-center text-gray-500">
+                <li className="px-4 sm:px-6 py-8 text-center text-gray-400">
                   No blog posts yet. Create your first one!
                 </li>
               ) : (
                 blogs.map((blog) => (
-                  <li key={blog._id} className="px-6 py-4">
-                    <div className="flex items-center justify-between">
+                  <li key={blog._id} className="px-4 sm:px-6 py-4 hover:bg-white/5 transition-colors">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-medium text-gray-900 truncate">
+                        <h3 className="text-base sm:text-lg font-medium text-white truncate">
                           {blog.title}
                         </h3>
-                        <p className="mt-1 text-sm text-gray-500 line-clamp-2">
+                        <p className="mt-1 text-sm text-gray-400 line-clamp-2">
                           {blog.excerpt}
                         </p>
-                        <div className="mt-2 flex items-center space-x-2">
+                        <div className="mt-2 flex flex-wrap items-center gap-2">
                           <span
                             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                               blog.published
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-yellow-100 text-yellow-800'
+                                ? 'bg-green-500/20 text-green-300 border border-green-500/30'
+                                : 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
                             }`}
                           >
                             {blog.published ? 'Published' : 'Draft'}
@@ -147,29 +147,29 @@ export default function DashboardPage() {
                           {blog.tags.map((tag) => (
                             <span
                               key={tag}
-                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/10 text-gray-300 border border-white/20"
                             >
                               {tag}
                             </span>
                           ))}
                         </div>
                       </div>
-                      <div className="ml-4 flex-shrink-0 flex space-x-2">
+                      <div className="flex flex-wrap lg:flex-shrink-0 gap-2">
                         <Link
                           href={`/admin/dashboard/edit/${blog._id}`}
-                          className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                          className="flex-1 sm:flex-none inline-flex items-center justify-center px-3 py-2 border border-white/20 shadow-sm text-sm font-medium rounded-lg text-white bg-white/5 hover:bg-white/10 transition-all"
                         >
                           Edit
                         </Link>
                         <button
                           onClick={() => togglePublish(blog)}
-                          className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                          className="flex-1 sm:flex-none inline-flex items-center justify-center px-3 py-2 border border-white/20 shadow-sm text-sm font-medium rounded-lg text-white bg-white/5 hover:bg-white/10 transition-all"
                         >
                           {blog.published ? 'Unpublish' : 'Publish'}
                         </button>
                         <button
                           onClick={() => handleDelete(blog._id)}
-                          className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+                          className="flex-1 sm:flex-none inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 transition-all"
                         >
                           Delete
                         </button>
