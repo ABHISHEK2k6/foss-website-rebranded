@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import "../app/globals.css";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -42,7 +41,7 @@ export default function Navbar() {
               <a href="/" className="text-lg hover:text-gray-300 transition-colors">Home</a>
               <a href="#about" className="text-lg hover:text-gray-300 transition-colors">About</a>
               <a href="/blogs" className="text-lg hover:text-gray-300 transition-colors">Blog</a>
-              <a href="#team" className="text-lg hover:text-gray-300 transition-colors">Team</a>
+              <a href="/team" className="text-lg hover:text-gray-300 transition-colors">Team</a>
               <a href="#contact" className="text-lg hover:text-gray-300 transition-colors">Contact</a>
             </div>
 
@@ -72,7 +71,7 @@ export default function Navbar() {
               <li><a href="/" className="block py-2 hover:text-gray-300 transition-colors" onClick={() => setOpen(false)}>Home</a></li>
               <li><a href="#about" className="block py-2 hover:text-gray-300 transition-colors" onClick={() => setOpen(false)}>About</a></li>
               <li><a href="/blogs" className="block py-2 hover:text-gray-300 transition-colors" onClick={() => setOpen(false)}>Blog</a></li>
-              <li><a href="#team" className="block py-2 hover:text-gray-300 transition-colors" onClick={() => setOpen(false)}>Team</a></li>
+              <li><a href="/team" className="block py-2 hover:text-gray-300 transition-colors" onClick={() => setOpen(false)}>Team</a></li>
               <li><a href="#contact" className="block py-2 hover:text-gray-300 transition-colors" onClick={() => setOpen(false)}>Contact</a></li>
             </ul>
           </div>

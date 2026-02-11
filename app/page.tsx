@@ -5,7 +5,6 @@ import AboutUs from "../components/AboutUs.jsx";
 import WhatWeDo from "../components/WhatWeDo.jsx";
 import Footer from "../components/Footer.jsx";
 import VideoPreloader from "../components/VideoPreloader.jsx";
-import "./globals.css";
 
 export default function Home() {
   return (
