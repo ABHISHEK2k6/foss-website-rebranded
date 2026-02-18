@@ -2,6 +2,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 
+// Updated: Feb 2026 - Force rebuild
 export default function Footer() {
     const [isMobile, setIsMobile] = useState(false);
 
@@ -102,7 +103,7 @@ export default function Footer() {
 
                             {/* Instagram */}
                             <a
-                                href="https://www.instagram.com/foss_ucek?igsh=bDJqZHlxNzhlaWsx"
+                                href="https://www.instagram.com/foss_ucek"
                                 className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 hover:bg-white/20 transition-all duration-300 hover:scale-110"
                             >
                                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -191,7 +192,7 @@ export default function Footer() {
 
                             {/* Instagram */}
                             <motion.a
-                                href="https://www.instagram.com/foss_ucek?igsh=bDJqZHlxNzhlaWsx"
+                                href="https://www.instagram.com/foss_ucek"
                                 className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-2 hover:bg-white/20 transition-colors duration-300"
                                 variants={{
                                     hidden: { scale: 0, rotate: 180 },
