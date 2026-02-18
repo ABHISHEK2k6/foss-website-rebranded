@@ -60,7 +60,7 @@ export async function GET() {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(range)}?key=${apiKey}`;
 
     const response = await fetch(url, {
-      next: { revalidate: 300 }
+      cache: 'no-store'
     });
 
     if (!response.ok) {
@@ -94,7 +94,14 @@ export async function GET() {
       }));
 
     return NextResponse.json(
-      { success: true, data: teamMembers }
+      { success: true, data: teamMembers },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      }
     );
   } catch (error: unknown) {
     console.error('Error fetching team data:', error);
