@@ -153,7 +153,7 @@ export default function Footer() {
                                 className="text-sm xs:text-base text-blue-400 hover:text-blue-300 transition-colors duration-300 underline break-all"
                                 whileHover={{ scale: 1.05 }}
                             >
-                                foss.uck.ac.in
+                                foss@uck.ac.in
                             </motion.a>
                         </div>
 
