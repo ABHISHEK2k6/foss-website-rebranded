@@ -2,7 +2,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import TeamMemberCard from '@/components/TeamMemberCard';
 
-export const revalidate = 300;
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
 
 interface TeamMember {
   image: string;
@@ -28,8 +29,7 @@ async function getTeamMembers(): Promise<TeamMember[]> {
     );
     
     const response = await fetch(`${baseUrl}/api/team`, {
-      cache: 'force-cache',
-      next: { revalidate: 300 }
+      cache: 'no-store'
     });
     
     if (!response.ok) {

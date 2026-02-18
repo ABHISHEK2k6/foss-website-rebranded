@@ -60,7 +60,7 @@ export default function WhatWeDo() {
             title: "HACKATHONS",
             content: "Organize coding competitions to solve real-world problems using FOSS.",
             route: "/hackathons",
-            image: "/hackathon.jpg",
+            image: "/events.jpg",
             imagePosition: "right"
         },
         {
@@ -68,7 +68,7 @@ export default function WhatWeDo() {
             title: "WORKSHOPS",
             content: "Conduct hands-on sessions on various FOSS technologies and tools.",
             route: "/workshops",
-            image: "/workshop.jpg",
+            image: "/events.jpg",
             imagePosition: "left"
         },
         {

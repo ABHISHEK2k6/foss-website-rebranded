@@ -83,7 +83,7 @@ export default function Footer() {
                                     href="mailto:fossucek@gmail.com"
                                     className="text-base text-blue-400 hover:text-blue-300 transition-colors duration-300 underline break-all"
                                 >
-                                    fossucek@gmail.com
+                                    foss@uck.ac.in
                                 </a>
                             </div>
                         </div>
@@ -92,7 +92,7 @@ export default function Footer() {
                         <div className="flex justify-center space-x-6 mb-6 scroll-footer-social delay-300">
                             {/* LinkedIn */}
                             <a
-                                href="#" 
+                                href="https://www.linkedin.com/company/foss-ucek/" 
                                 className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 hover:bg-white/20 transition-all duration-300 hover:scale-110"
                             >
                                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -102,7 +102,7 @@ export default function Footer() {
 
                             {/* Instagram */}
                             <a
-                                href="#"
+                                href="https://www.instagram.com/foss_ucek?igsh=bDJqZHlxNzhlaWsx"
                                 className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 hover:bg-white/20 transition-all duration-300 hover:scale-110"
                             >
                                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -153,7 +153,7 @@ export default function Footer() {
                                 className="text-sm xs:text-base text-blue-400 hover:text-blue-300 transition-colors duration-300 underline break-all"
                                 whileHover={{ scale: 1.05 }}
                             >
-                                fossucek@gmail.com
+                                foss.uck.ac.in
                             </motion.a>
                         </div>
 
@@ -175,7 +175,7 @@ export default function Footer() {
                         >
                             {/* LinkedIn */}
                             <motion.a
-                                href="#"
+                                href="https://www.linkedin.com/company/foss-ucek/"
                                 className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-2 hover:bg-white/20 transition-colors duration-300"
                                 variants={{
                                     hidden: { scale: 0, rotate: 180 },
@@ -191,7 +191,7 @@ export default function Footer() {
 
                             {/* Instagram */}
                             <motion.a
-                                href="#"
+                                href="https://www.instagram.com/foss_ucek?igsh=bDJqZHlxNzhlaWsx"
                                 className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-2 hover:bg-white/20 transition-colors duration-300"
                                 variants={{
                                     hidden: { scale: 0, rotate: 180 },
