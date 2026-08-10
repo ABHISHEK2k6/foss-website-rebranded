@@ -93,14 +93,7 @@ export default function RootLayout({
         {/* Global Overlay Video — pointer-events-none is important here specifically:
             <video> elements have their own native touch-gesture handling in some
             browsers even without visible controls, which can swallow a touch-drag
-            as a media gesture instead of letting it bubble up as a page scroll.
-
-            TEMPORARILY not autoplaying/looping, as a test: this sits behind many
-            backdrop-blur elements (cards, navbar, footer), and every one of them
-            has to re-sample whatever's behind it on every single frame the video
-            changes — a well-known expensive combination. Freezing it on its first
-            frame removes that continuous recompositing cost, to see if that's
-            what's causing the scroll jank while other things are animating. */}
+            as a media gesture instead of letting it bubble up as a page scroll. */}
         <video
           className="fixed inset-0 w-full h-full object-cover -z-10 pointer-events-none"
           style={{
@@ -109,6 +102,8 @@ export default function RootLayout({
             mixBlendMode: 'screen'
           }}
           muted
+          autoPlay
+          loop
           playsInline
           preload="auto"
         >

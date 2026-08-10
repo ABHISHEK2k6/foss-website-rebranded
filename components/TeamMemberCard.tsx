@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import TeamMemberModal from './TeamMemberModal';
 
 // Prefetches the *Next-optimized* image the modal will actually request
@@ -36,11 +36,21 @@ interface TeamMemberCardProps {
   index: number;
   size?: 'small' | 'medium' | 'large';
   priority?: boolean;
+  // Called once this card's image has either loaded, failed, or was never
+  // there to begin with — lets a parent (e.g. TeamMembersGrid) know when it's
+  // safe to stop covering the page with a loading screen.
+  onSettle?: () => void;
 }
 
-export default function TeamMemberCard({ member, index, size = 'small', priority = false }: TeamMemberCardProps) {
+export default function TeamMemberCard({ member, index, size = 'small', priority = false, onSettle }: TeamMemberCardProps) {
   const [imageError, setImageError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // No image to load at all — nothing to wait on, so settle immediately.
+  useEffect(() => {
+    if (!member.image) onSettle?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [member.image]);
 
   const isHQ = member.role?.toLowerCase() === 'hq';
 
@@ -69,9 +79,13 @@ export default function TeamMemberCard({ member, index, size = 'small', priority
             fill
             sizes="(max-width: 639px) 100vw, 256px"
             className="object-cover group-hover:scale-110 transition-transform duration-300"
-            onError={() => setImageError(true)}
+            onLoad={() => onSettle?.()}
+            onError={() => {
+              setImageError(true);
+              onSettle?.();
+            }}
             priority={priority}
-            loading={priority ? undefined : 'lazy'}
+            loading={priority ? undefined : 'eager'}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-purple-600 to-blue-600">

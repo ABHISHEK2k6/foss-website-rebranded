@@ -1,6 +1,6 @@
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import TeamMemberCard from '@/components/TeamMemberCard';
+import TeamMembersGrid from '@/components/TeamMembersGrid';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -141,65 +141,18 @@ export default async function TeamPage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-16">
-            {/* HQ Team: Chairperson first, then Vice-Chairperson, then any other HQ members */}
-            {hqMembers.length > 0 && (
-              <div>
-                <h2 className="text-2xl font-bold text-center mb-6 text-gray-200">
-                  HQ Team
-                </h2>
-                <div className="flex justify-center flex-wrap gap-4">
-                  {hqMembers.map((member, index) => (
-                    <div key={index} className="w-full sm:w-64">
-                      <TeamMemberCard member={member} index={index} size="medium" priority={index < 2} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Mentors, regardless of which team they belong to */}
-            {mentors.length > 0 && (
-              <div>
-                <h2 className="text-2xl font-bold text-center mb-6 text-gray-200">
-                  Mentors
-                </h2>
-                <div className="flex justify-center flex-wrap gap-4">
-                  {mentors.map((member, index) => (
-                    <div key={index} className="w-full sm:w-64">
-                      <TeamMemberCard member={member} index={index} size="medium" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Team Sections */}
-            {Object.keys(teamGroups).sort((a, b) => {
+          <TeamMembersGrid
+            hqMembers={hqMembers}
+            mentors={mentors}
+            teamGroups={teamGroups}
+            sortedTeamNames={Object.keys(teamGroups).sort((a, b) => {
               // Technical team first
               if (a.toLowerCase() === 'technical') return -1;
               if (b.toLowerCase() === 'technical') return 1;
               // Then alphabetically
               return a.localeCompare(b);
-            }).map((teamName, teamIndex) => (
-              <div key={teamName}>
-                <h2 className="text-2xl font-bold text-center mb-6 text-gray-200">
-                  {teamName} Team
-                </h2>
-                <div className="flex justify-center flex-wrap gap-4">
-                  {teamGroups[teamName].map((member, index) => (
-                    <div key={index} className="w-full sm:w-64">
-                      <TeamMemberCard 
-                        member={member} 
-                        index={teamIndex * 10 + index} 
-                        size="medium"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+            })}
+          />
         )}
       </div>
 

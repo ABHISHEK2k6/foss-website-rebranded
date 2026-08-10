@@ -7,6 +7,7 @@ const siteUrl = 'https://foss-website-rebranded.vercel.app';
 const staticRoutes: MetadataRoute.Sitemap = [
   { url: siteUrl, changeFrequency: 'weekly', priority: 1 },
   { url: `${siteUrl}/team`, changeFrequency: 'weekly', priority: 0.8 },
+  { url: `${siteUrl}/contact`, changeFrequency: 'monthly', priority: 0.6 },
   { url: `${siteUrl}/blogs`, changeFrequency: 'daily', priority: 0.8 },
   { url: `${siteUrl}/hackathons`, changeFrequency: 'weekly', priority: 0.8 },
   { url: `${siteUrl}/workshops`, changeFrequency: 'weekly', priority: 0.8 },
