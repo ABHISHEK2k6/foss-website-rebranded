@@ -1,6 +1,12 @@
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import TeamMemberCard from '@/components/TeamMemberCard';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Team',
+  description: 'Meet the Execom core team, mentors, and department leads driving FOSS UCEK forward.',
+};
 
 // Was force-dynamic + revalidate 0. The page now caches for the same 60s
 // window as /api/team, so a page visit doesn't force its own fresh round-trip

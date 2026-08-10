@@ -2,6 +2,12 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ActivityListing from '@/components/ActivityListing';
 import { getActivitiesFromApi } from '@/lib/fetchActivities';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Online Sessions',
+  description: 'Webinars and virtual sessions you can join from anywhere, hosted by FOSS UCEK.',
+};
 
 export const revalidate = 60;
 

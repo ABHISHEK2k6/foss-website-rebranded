@@ -2,6 +2,12 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ActivityListing from '@/components/ActivityListing';
 import { getActivitiesFromApi } from '@/lib/fetchActivities';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Events',
+  description: 'Seminars, meetups, and community gatherings hosted by FOSS UCEK.',
+};
 
 export const revalidate = 60;
 

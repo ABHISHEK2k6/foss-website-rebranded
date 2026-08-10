@@ -1,10 +1,62 @@
 import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
-import type { Viewport } from 'next';
+import type { Metadata, Viewport } from 'next';
 
-export const metadata = {
-  title: 'FOSS UCEK',
-  description: 'Free and Open Source Software - University College of Engineering Kariyavattom',
+const siteUrl = 'https://foss-website-rebranded.vercel.app';
+const siteName = 'FOSS UCEK';
+const siteDescription = 'Free and Open Source Software - University College of Engineering Kariyavattom. Hackathons, workshops, events, and online sessions from the FOSS club at UCEK.';
+
+// NOTE: update siteUrl above if this project is deployed to a custom domain —
+// it's used to build absolute Open Graph/Twitter image URLs and the sitemap.
+export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: siteName,
+    template: `%s | ${siteName}`,
+  },
+  description: siteDescription,
+  keywords: [
+    'FOSS UCEK',
+    'Free and Open Source Software',
+    'University College of Engineering Kariyavattom',
+    'UCEK',
+    'open source club',
+    'hackathons',
+    'workshops',
+    'tech community Kerala',
+    'FOSS club',
+  ],
+  authors: [{ name: siteName }],
+  icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
+  openGraph: {
+    title: siteName,
+    description: siteDescription,
+    url: '/',
+    siteName,
+    images: [{ url: '/logo.png', width: 1024, height: 1024, alt: `${siteName} Logo` }],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: siteName,
+    description: siteDescription,
+    images: ['/logo.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 }
 
 // Next.js's App Router expects `viewport` as an object matching its `Viewport`

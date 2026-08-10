@@ -2,6 +2,12 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ActivityListing from '@/components/ActivityListing';
 import { getActivitiesFromApi } from '@/lib/fetchActivities';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Workshops',
+  description: 'Hands-on sessions to help you learn and build new skills with FOSS UCEK.',
+};
 
 export const revalidate = 60;
 

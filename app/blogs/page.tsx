@@ -1,6 +1,12 @@
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ClientBlogCard from '@/components/ClientBlogCard';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Blog',
+  description: 'Insights, tutorials, and stories from the FOSS UCEK open-source community.',
+};
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;

@@ -2,6 +2,12 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ActivityListing from '@/components/ActivityListing';
 import { getActivitiesFromApi } from '@/lib/fetchActivities';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Hackathons',
+  description: 'Build, compete, and ship something great with the FOSS UCEK community.',
+};
 
 export const revalidate = 60;
 
