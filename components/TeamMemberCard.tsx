@@ -5,12 +5,19 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import TeamMemberModal from './TeamMemberModal';
 
-// Preload image function
+// Prefetches the *Next-optimized* image the modal will actually request
+// (/_next/image?url=...&w=...&q=60), not just the raw Drive URL — those are
+// separate fetch pipelines. Prefetching the raw source never warmed Next's own
+// server-side optimization cache, so the modal image still had to be fetched
+// from Drive and re-encoded from scratch the moment it opened. Firing this on
+// hover (desktop) and touchstart (mobile, fires just before the tap completes)
+// gives Next a head start so it's already warm by the time the modal opens.
 const preloadImage = (src: string) => {
   if (typeof window !== 'undefined' && src) {
+    const optimizedUrl = `/_next/image?url=${encodeURIComponent(src)}&w=828&q=60`;
     const link = document.createElement('link');
     link.rel = 'prefetch';
-    link.href = src;
+    link.href = optimizedUrl;
     link.as = 'image';
     document.head.appendChild(link);
   }
@@ -28,9 +35,10 @@ interface TeamMemberCardProps {
   };
   index: number;
   size?: 'small' | 'medium' | 'large';
+  priority?: boolean;
 }
 
-export default function TeamMemberCard({ member, index, size = 'small' }: TeamMemberCardProps) {
+export default function TeamMemberCard({ member, index, size = 'small', priority = false }: TeamMemberCardProps) {
   const [imageError, setImageError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -48,9 +56,10 @@ export default function TeamMemberCard({ member, index, size = 'small' }: TeamMe
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: index * 0.02 }}
-        className="group relative bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10 hover:border-white/30 hover:bg-white/10 transition-all duration-300 cursor-pointer"
+        className="group relative bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10 hover:border-white/30 hover:bg-white/10 transition-colors duration-300 cursor-pointer"
         onClick={() => setIsModalOpen(true)}
         onMouseEnter={() => preloadImage(member.image)}
+        onTouchStart={() => preloadImage(member.image)}
       >
       <div className={`relative w-full ${sizeClasses[size]} overflow-hidden`}>
         {member.image && !imageError ? (
@@ -58,19 +67,20 @@ export default function TeamMemberCard({ member, index, size = 'small' }: TeamMe
             src={member.image}
             alt={member.name}
             fill
-            sizes="256px"
+            sizes="(max-width: 639px) 100vw, 256px"
             className="object-cover group-hover:scale-110 transition-transform duration-300"
             onError={() => setImageError(true)}
-            loading="lazy"
+            priority={priority}
+            loading={priority ? undefined : 'lazy'}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-600 to-blue-600">
+          <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-purple-600 to-blue-600">
             <span className="text-6xl font-bold text-white">
               {member.name.charAt(0).toUpperCase()}
             </span>
           </div>
         )}
-        {/* <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div> */}
+        {/* <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div> */}
       </div>
       
       <div className="p-4 text-center">

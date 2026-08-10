@@ -109,7 +109,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
                   </span>
                 ))}
               </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-linear-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
                 {blog.title}
               </h1>
               <div className="flex items-center text-gray-400 space-x-4">

@@ -7,18 +7,29 @@ This guide will help you set up the dynamic team members page that fetches data 
 1. Go to [Google Sheets](https://sheets.google.com)
 2. Create a new spreadsheet
 3. Name it something like "FOSS Team Members"
-4. In **Sheet1**, create the following structure:
+4. The response tab must be named exactly **`Team`** (the API route reads
+   `'Team'!A2:M` — if you rename the tab, update `app/api/team/route.ts` to match).
 
-| Image URL | Name | Role |
-|-----------|------|------|
-| [Drive link] | John Doe | President |
-| [Drive link] | Jane Smith | Vice President |
+| Column | Field |
+|--------|-------|
+| A | Timestamp (auto, from the form) |
+| B | Name |
+| C | Team |
+| D | Position |
+| E | Year |
+| F | Department |
+| G | Date of Birth |
+| H | Email |
+| I | Mobile Number |
+| J | Instagram Profile Link |
+| K | Linkedin Profile Link |
+| L | Github Profile Link |
+| M | Photo (Google Drive share link) |
 
 **Important Notes:**
 - Row 1 is the header (will be skipped)
-- Column A: Image URL (Google Drive link)
-- Column B: Member Name
-- Column C: Member Role
+- Don't reorder, insert, or delete columns on the live form — the API route reads
+  by fixed column position
 
 ## Step 2: Set Up Google Drive Images
 

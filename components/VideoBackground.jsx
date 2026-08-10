@@ -103,7 +103,7 @@ export default function VideoBackground({
         <>
             {/* Optimized fallback static background with faster loading */}
             <div 
-                className="absolute inset-0 -z-20 bg-gradient-to-br from-gray-900 via-black to-gray-800"
+                className="absolute inset-0 -z-20 bg-linear-to-br from-gray-900 via-black to-gray-800"
             >
                 <div
                     className="w-full h-full bg-center bg-no-repeat bg-cover opacity-80"

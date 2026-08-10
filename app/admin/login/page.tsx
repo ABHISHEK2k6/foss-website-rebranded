@@ -40,7 +40,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-black text-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+          <h2 className="mt-6 text-center text-3xl font-extrabold bg-linear-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
             Admin Login
           </h2>
           <p className="mt-2 text-center text-sm text-gray-400">
@@ -92,7 +92,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>

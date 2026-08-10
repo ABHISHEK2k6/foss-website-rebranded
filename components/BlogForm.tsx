@@ -178,7 +178,7 @@ export default function BlogForm({ blogId }: BlogFormProps) {
     <div className="min-h-screen bg-black text-white py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white/5 backdrop-blur-sm border border-white/10 shadow-xl rounded-lg p-4 sm:p-6">
-          <h1 className="text-xl sm:text-2xl font-bold mb-6 bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+          <h1 className="text-xl sm:text-2xl font-bold mb-6 bg-linear-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
             {blogId ? 'Edit Blog Post' : 'Create New Blog Post'}
           </h1>
 
@@ -256,7 +256,7 @@ export default function BlogForm({ blogId }: BlogFormProps) {
                     accept="image/*"
                     onChange={handleImageUpload}
                     disabled={uploading}
-                    className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-purple-600 file:to-blue-600 file:text-white hover:file:from-purple-700 hover:file:to-blue-700 disabled:opacity-50 file:cursor-pointer cursor-pointer"
+                    className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-linear-to-r file:from-purple-600 file:to-blue-600 file:text-white hover:file:from-purple-700 hover:file:to-blue-700 disabled:opacity-50 file:cursor-pointer cursor-pointer"
                   />
                   {uploading && (
                     <p className="text-sm text-gray-400">Uploading image...</p>
@@ -353,7 +353,7 @@ export default function BlogForm({ blogId }: BlogFormProps) {
                     type="button"
                     onClick={(e) => handleSubmit(e, true)}
                     disabled={loading}
-                    className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 transition-all"
+                    className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 transition-all"
                   >
                     {loading ? 'Publishing...' : 'Publish'}
                   </button>

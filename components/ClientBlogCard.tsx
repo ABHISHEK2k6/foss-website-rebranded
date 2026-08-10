@@ -27,7 +27,7 @@ export default function ClientBlogCard({ blog, index }: ClientBlogCardProps) {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: index * 0.1 }}
-        className="group bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 hover:border-white/30 hover:bg-white/10 transition-all duration-300 flex flex-col h-full"
+        className="group bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 hover:border-white/30 hover:bg-white/10 transition-colors duration-300 flex flex-col h-full"
       >
         {blog.coverImage && (
           <div className="relative w-full aspect-video overflow-hidden">
@@ -39,10 +39,10 @@ export default function ClientBlogCard({ blog, index }: ClientBlogCardProps) {
               className="object-cover group-hover:scale-110 transition-transform duration-300"
               priority={index < 3}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
           </div>
         )}
-        <div className="p-5 flex flex-col flex-grow">
+        <div className="p-5 flex flex-col grow">
           <div className="flex flex-wrap gap-2 mb-2">
             {blog.tags.slice(0, 2).map((tag) => (
               <span
@@ -56,7 +56,7 @@ export default function ClientBlogCard({ blog, index }: ClientBlogCardProps) {
           <h2 className="text-xl font-bold mb-2 group-hover:text-gray-300 transition-colors line-clamp-2">
             {blog.title}
           </h2>
-          <p className="text-gray-400 mb-3 line-clamp-2 text-sm flex-grow">
+          <p className="text-gray-400 mb-3 line-clamp-2 text-sm grow">
             {blog.excerpt}
           </p>
           <div className="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-white/10">

@@ -89,12 +89,12 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 sm:h-16 gap-4 sm:gap-0">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">Admin Dashboard</h1>
+              <h1 className="text-xl font-bold bg-linear-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">Admin Dashboard</h1>
             </div>
             <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
               <Link
                 href="/admin/dashboard/new"
-                className="flex-1 sm:flex-none bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all text-center text-sm sm:text-base"
+                className="flex-1 sm:flex-none bg-linear-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all text-center text-sm sm:text-base"
               >
                 New Blog Post
               </Link>
@@ -154,7 +154,7 @@ export default function DashboardPage() {
                           ))}
                         </div>
                       </div>
-                      <div className="flex flex-wrap lg:flex-shrink-0 gap-2">
+                      <div className="flex flex-wrap lg:shrink-0 gap-2">
                         <Link
                           href={`/admin/dashboard/edit/${blog._id}`}
                           className="flex-1 sm:flex-none inline-flex items-center justify-center px-3 py-2 border border-white/20 shadow-sm text-sm font-medium rounded-lg text-white bg-white/5 hover:bg-white/10 transition-all"

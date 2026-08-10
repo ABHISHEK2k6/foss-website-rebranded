@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+// Was force-dynamic + no-store, meaning every single page view re-fetched
+// from the Google Sheets API from scratch (multi-second round-trips observed).
+// The roster doesn't change minute-to-minute, so a short revalidation window
+// lets Next cache the response and serve near-instantly, only going back to
+// Sheets in the background once the window has passed.
+export const revalidate = 60;
 
 interface TeamMember {
   image: string;
@@ -56,11 +60,11 @@ export async function GET() {
     // Fetch data from Google Sheets
     // Sheet structure: Timestamp, Name, Team, Position, Year, Department, DOB, Email, Mobile, Instagram, LinkedIn, GitHub, Photo
     // Columns: A=Timestamp, B=Name, C=Team, D=Position, E=Year, F=Department, G=DOB, H=Email, I=Mobile, J=Instagram, K=LinkedIn, L=GitHub, M=Photo
-    const range = "'Form responses 1'!A2:M"; // Skip header row, get all columns
+    const range = "'Team'!A2:M"; // Skip header row, get all columns
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(range)}?key=${apiKey}`;
 
     const response = await fetch(url, {
-      cache: 'no-store'
+      next: { revalidate: 60 }
     });
 
     if (!response.ok) {
@@ -97,9 +101,11 @@ export async function GET() {
       { success: true, data: teamMembers },
       {
         headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
-          'Pragma': 'no-cache',
-          'Expires': '0'
+          // Cached for 60s; stale-while-revalidate lets Next serve the (slightly
+          // stale) cached copy instantly for up to 5 more minutes while it
+          // refetches in the background, instead of every visitor waiting on
+          // a fresh Google Sheets round-trip.
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
         }
       }
     );

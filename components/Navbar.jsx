@@ -5,37 +5,82 @@ import Image from "next/image";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const isScrolled = window.scrollY > 50;
-      setScrolled(isScrolled);
+    let ticking = false;
+
+    const updateProgress = () => {
+      // Fades/blurs in continuously over the first 10px of scroll — short enough
+      // that the very first bit of scroll already produces a visible change,
+      // instead of a "dead zone" before anything happens.
+      setScrollProgress(Math.min(window.scrollY / 10, 1));
+      ticking = false;
     };
 
-    window.addEventListener('scroll', handleScroll);
+    // rAF-throttled: native scroll events can fire far more often than the
+    // display can paint, so without this every single event was triggering
+    // its own React re-render — that extra main-thread work while scrolling
+    // through animated sections is what read as jank elsewhere on the page.
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    };
+
+    updateProgress();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const scrolled = scrollProgress > 0.2;
+
   return (
     <>
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 w-full max-w-full ${
-        scrolled ? 'bg-black/30 backdrop-blur-lg border-b border-white/20 shadow-lg' : 'bg-transparent'
-      }`}>
-        <ul className="flex flex-row justify-between items-start py-3 px-4 text-white w-full max-w-full">
-          <li className="flex-shrink-0">
+      <nav
+        className="fixed top-0 left-0 right-0 z-50 w-full max-w-full border-b border-white/20"
+        style={{
+          backgroundColor: `rgba(0, 0, 0, ${0.8 * scrollProgress})`,
+          backdropFilter: `blur(${16 * scrollProgress}px)`,
+          WebkitBackdropFilter: `blur(${16 * scrollProgress}px)`,
+          borderBottomColor: `rgba(255, 255, 255, ${0.2 * scrollProgress})`,
+          boxShadow: scrollProgress > 0.5 ? '0 4px 24px rgba(0,0,0,0.3)' : 'none',
+          // These are set directly from JS on every scroll event, so without an
+          // explicit transition they'd jump per-event instead of interpolating —
+          // that's what read as a "pause"/stutter rather than a smooth fade.
+          transition: 'background-color 150ms ease-out, backdrop-filter 150ms ease-out, border-color 150ms ease-out, box-shadow 150ms ease-out',
+          // Pre-promotes this element to its own GPU compositing layer at mount
+          // time instead of paying that cost mid-scroll — that first-time layer
+          // promotion is what caused the initial-scroll jank before it smoothed out.
+          willChange: 'background-color, backdrop-filter',
+        }}
+      >
+        <ul
+          className={`flex flex-row justify-between items-center px-4 text-white w-full max-w-full transition-[padding] duration-300 ${
+            scrolled ? 'py-2.5' : 'py-4'
+          }`}
+        >
+          <li className="shrink-0">
             <Link href="/">
-              <Image 
-                src="/logo.png" 
-                alt="FOSS Logo" 
-                width={140} 
+              {/*
+                Real height classes here, not a transform:scale() — a scale transform
+                is paint-only and doesn't shrink the element's layout box, so it was
+                never actually reducing the navbar's height.
+              */}
+              <Image
+                src="/logo.png"
+                alt="FOSS Logo"
+                width={140}
                 height={50}
-                className="cursor-pointer hover:opacity-80 transition-opacity"
+                className={`cursor-pointer hover:opacity-80 transition-all duration-300 w-auto ${
+                  scrolled ? 'h-18' : 'h-30'
+                }`}
                 priority
               />
             </Link>
           </li>
-          <li className="flex items-start pt-10">
+          <li className="flex items-center">
             {/* Desktop links (unchanged) */}
             <div className="hidden md:flex flex-row gap-8">
               <a href="/" className="text-lg hover:text-gray-300 transition-colors">Home</a>

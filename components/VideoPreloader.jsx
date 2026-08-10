@@ -11,8 +11,7 @@ export default function VideoPreloader() {
             video.load();
         };
 
-        // Preload both videos immediately
-        preloadVideo('/2.mp4');
+        // Preload the background overlay video
         preloadVideo('/overlay.mp4');
 
         // Also preload the background image

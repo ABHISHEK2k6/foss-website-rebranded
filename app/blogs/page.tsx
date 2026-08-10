@@ -52,9 +52,9 @@ export default async function BlogsPage() {
       <Navbar />
 
       {/* Hero Section */}
-      <div className="relative pt-32 pb-16 px-4 sm:px-6 lg:px-8">
+      <div className="relative pt-22 pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold p-2 bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold p-2 bg-linear-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
             FOSS Blog
           </h1>
           <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">

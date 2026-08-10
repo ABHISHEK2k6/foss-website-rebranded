@@ -2,8 +2,10 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import TeamMemberCard from '@/components/TeamMemberCard';
 
-export const revalidate = 0;
-export const dynamic = 'force-dynamic';
+// Was force-dynamic + revalidate 0. The page now caches for the same 60s
+// window as /api/team, so a page visit doesn't force its own fresh round-trip
+// on top of what the API route already fetched.
+export const revalidate = 60;
 
 interface TeamMember {
   image: string;
@@ -29,7 +31,7 @@ async function getTeamMembers(): Promise<TeamMember[]> {
     );
     
     const response = await fetch(`${baseUrl}/api/team`, {
-      cache: 'no-store'
+      next: { revalidate: 60 }
     });
     
     if (!response.ok) {
@@ -48,23 +50,35 @@ async function getTeamMembers(): Promise<TeamMember[]> {
 export default async function TeamPage() {
   const teamMembers = await getTeamMembers();
 
-  // Organize team members by hierarchy
-  const chairperson = teamMembers.find(m => m.position?.toLowerCase() === 'chairperson');
-  const viceChairperson = teamMembers.find(m => m.position?.toLowerCase() === 'vice chairperson');
-  
-  // Group remaining members by team (excluding HQ team)
+  // Normalize "Vice-Chairperson" / "Vice Chairperson" / etc. to a single comparable form
+  const normalizedPosition = (m: TeamMember) => m.position?.toLowerCase().replace(/-/g, ' ').trim() || '';
+  const isChairperson = (m: TeamMember) => normalizedPosition(m) === 'chairperson';
+  const isViceChairperson = (m: TeamMember) => normalizedPosition(m) === 'vice chairperson';
+  const isMentor = (m: TeamMember) => normalizedPosition(m) === 'mentor';
+  const isHQ = (m: TeamMember) => m.role?.toLowerCase() === 'hq';
+
+  // HQ Team: Chairperson first, then Vice-Chairperson, then any other HQ members
+  const chairperson = teamMembers.find(isChairperson);
+  const viceChairperson = teamMembers.find(m => isViceChairperson(m) && m !== chairperson);
+  const otherHQ = teamMembers.filter(
+    m => isHQ(m) && m !== chairperson && m !== viceChairperson && !isMentor(m)
+  );
+  const hqMembers = [chairperson, viceChairperson, ...otherHQ].filter(
+    (m): m is TeamMember => Boolean(m)
+  );
+
+  // Mentors: pulled out into their own section regardless of which team they belong to
+  const mentors = teamMembers.filter(m => isMentor(m) && !hqMembers.includes(m));
+
+  // Group everyone else by team
   const teamGroups: Record<string, TeamMember[]> = {};
   teamMembers.forEach(member => {
-    const pos = member.position?.toLowerCase();
-    const isHQ = member.role?.toLowerCase() === 'hq';
-    
-    // Skip chairperson, vice chairperson, and all HQ team members
-    if (pos !== 'chairperson' && pos !== 'vice chairperson' && !isHQ) {
-      if (!teamGroups[member.role]) {
-        teamGroups[member.role] = [];
-      }
-      teamGroups[member.role].push(member);
+    if (hqMembers.includes(member) || mentors.includes(member)) return;
+
+    if (!teamGroups[member.role]) {
+      teamGroups[member.role] = [];
     }
+    teamGroups[member.role].push(member);
   });
 
   // Sort members within each team: Lead first, then Co-lead, then others
@@ -88,7 +102,7 @@ export default async function TeamPage() {
       {/* Hero Section */}
       <div className="relative pt-32 pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-linear-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
             Execom Core Team
           </h1>
           <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
@@ -122,19 +136,35 @@ export default async function TeamPage() {
           </div>
         ) : (
           <div className="space-y-16">
-            {/* Chairperson and Vice Chairperson - No Title */}
-            {(chairperson || viceChairperson) && (
-              <div className="flex justify-center gap-6 flex-wrap">
-                {chairperson && (
-                  <div className="w-full sm:w-64">
-                    <TeamMemberCard member={chairperson} index={0} size="medium" />
-                  </div>
-                )}
-                {viceChairperson && (
-                  <div className="w-full sm:w-64">
-                    <TeamMemberCard member={viceChairperson} index={1} size="medium" />
-                  </div>
-                )}
+            {/* HQ Team: Chairperson first, then Vice-Chairperson, then any other HQ members */}
+            {hqMembers.length > 0 && (
+              <div>
+                <h2 className="text-2xl font-bold text-center mb-6 text-gray-200">
+                  HQ Team
+                </h2>
+                <div className="flex justify-center flex-wrap gap-4">
+                  {hqMembers.map((member, index) => (
+                    <div key={index} className="w-full sm:w-64">
+                      <TeamMemberCard member={member} index={index} size="medium" priority={index < 2} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Mentors, regardless of which team they belong to */}
+            {mentors.length > 0 && (
+              <div>
+                <h2 className="text-2xl font-bold text-center mb-6 text-gray-200">
+                  Mentors
+                </h2>
+                <div className="flex justify-center flex-wrap gap-4">
+                  {mentors.map((member, index) => (
+                    <div key={index} className="w-full sm:w-64">
+                      <TeamMemberCard member={member} index={index} size="medium" />
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
