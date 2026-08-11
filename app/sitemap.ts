@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import dbConnect from '@/lib/mongodb';
 import Blog from '@/models/Blog';
 
-const siteUrl = 'https://foss-website-rebranded.vercel.app';
+const siteUrl = 'https://foss.uck.ac.in';
 
 const staticRoutes: MetadataRoute.Sitemap = [
   { url: siteUrl, changeFrequency: 'weekly', priority: 1 },

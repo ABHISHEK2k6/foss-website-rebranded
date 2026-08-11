@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-const siteUrl = 'https://foss-website-rebranded.vercel.app';
+const siteUrl = 'https://foss.uck.ac.in';
 
 export default function robots(): MetadataRoute.Robots {
   return {

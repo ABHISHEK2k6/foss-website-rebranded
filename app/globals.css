@@ -93,10 +93,14 @@ video {
     box-sizing: border-box;
   }
   
-  /* Specific fixes for common overflow causes */
+  /* Specific fixes for common overflow causes.
+     max-width alone stops elements overflowing the viewport — forcing
+     width: 100% here as well used to blow up intentionally small,
+     fixed-size elements (e.g. the loading spinner) to fill their
+     container, since this unlayered rule beats even Tailwind's utility
+     classes regardless of specificity. */
   div, section, main, header, footer {
     max-width: 100%;
-    width: 100%;
   }
   
   /* Mobile video optimizations */

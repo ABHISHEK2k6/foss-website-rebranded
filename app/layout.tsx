@@ -2,12 +2,9 @@ import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
 import type { Metadata, Viewport } from 'next';
 
-const siteUrl = 'https://foss-website-rebranded.vercel.app';
+const siteUrl = 'https://foss.uck.ac.in';
 const siteName = 'FOSS UCEK';
 const siteDescription = 'Free and Open Source Software - University College of Engineering Kariyavattom. Hackathons, workshops, events, and online sessions from the FOSS club at UCEK.';
-
-// NOTE: update siteUrl above if this project is deployed to a custom domain —
-// it's used to build absolute Open Graph/Twitter image URLs and the sitemap.
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
