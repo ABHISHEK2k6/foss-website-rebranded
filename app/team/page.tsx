@@ -1,6 +1,6 @@
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import TeamMembersGrid from '@/components/TeamMembersGrid';
+import TeamCarousel from '@/components/TeamCarousel';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,10 +8,9 @@ export const metadata: Metadata = {
   description: 'Meet the Execom core team, mentors, and department leads driving FOSS UCEK forward.',
 };
 
-// Was force-dynamic + revalidate 0. The page now caches for the same 60s
-// window as /api/team, so a page visit doesn't force its own fresh round-trip
-// on top of what the API route already fetched.
-export const revalidate = 60;
+// Fully dynamic, matching /api/team: every page load fetches the current
+// roster instead of serving a cached copy shared across visitors.
+export const dynamic = 'force-dynamic';
 
 interface TeamMember {
   image: string;
@@ -24,27 +23,28 @@ interface TeamMember {
   instagram?: string;
   linkedin?: string;
   github?: string;
+  status?: string;
 }
 
 async function getTeamMembers(): Promise<TeamMember[]> {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (
-      process.env.NODE_ENV === 'production' 
-        ? (process.env.VERCEL_URL 
-          ? `https://${process.env.VERCEL_URL}` 
+      process.env.NODE_ENV === 'production'
+        ? (process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
           : 'https://foss-website-rebranded.vercel.app')
         : 'http://localhost:3000'
     );
-    
+
     const response = await fetch(`${baseUrl}/api/team`, {
-      next: { revalidate: 60 }
+      cache: 'no-store'
     });
-    
+
     if (!response.ok) {
       console.error('Failed to fetch team members:', response.status, response.statusText);
       return [];
     }
-    
+
     const data = await response.json();
     return data.success ? data.data : [];
   } catch (error) {
@@ -53,32 +53,30 @@ async function getTeamMembers(): Promise<TeamMember[]> {
   }
 }
 
-export default async function TeamPage() {
-  const teamMembers = await getTeamMembers();
-
-  // Normalize "Vice-Chairperson" / "Vice Chairperson" / etc. to a single comparable form
+// Flattens a set of members into a single ordered list: HQ (Chairperson,
+// then Vice-Chairperson, then other HQ), Mentors, then every other team
+// (Technical first, then alphabetical), Lead/Co-lead first within each team.
+// Used to build both the Current and Alumni rosters the same way.
+function buildOrderedRoster(members: TeamMember[]): TeamMember[] {
   const normalizedPosition = (m: TeamMember) => m.position?.toLowerCase().replace(/-/g, ' ').trim() || '';
   const isChairperson = (m: TeamMember) => normalizedPosition(m) === 'chairperson';
   const isViceChairperson = (m: TeamMember) => normalizedPosition(m) === 'vice chairperson';
   const isMentor = (m: TeamMember) => normalizedPosition(m) === 'mentor';
   const isHQ = (m: TeamMember) => m.role?.toLowerCase() === 'hq';
 
-  // HQ Team: Chairperson first, then Vice-Chairperson, then any other HQ members
-  const chairperson = teamMembers.find(isChairperson);
-  const viceChairperson = teamMembers.find(m => isViceChairperson(m) && m !== chairperson);
-  const otherHQ = teamMembers.filter(
+  const chairperson = members.find(isChairperson);
+  const viceChairperson = members.find(m => isViceChairperson(m) && m !== chairperson);
+  const otherHQ = members.filter(
     m => isHQ(m) && m !== chairperson && m !== viceChairperson && !isMentor(m)
   );
   const hqMembers = [chairperson, viceChairperson, ...otherHQ].filter(
     (m): m is TeamMember => Boolean(m)
   );
 
-  // Mentors: pulled out into their own section regardless of which team they belong to
-  const mentors = teamMembers.filter(m => isMentor(m) && !hqMembers.includes(m));
+  const mentors = members.filter(m => isMentor(m) && !hqMembers.includes(m));
 
-  // Group everyone else by team
   const teamGroups: Record<string, TeamMember[]> = {};
-  teamMembers.forEach(member => {
+  members.forEach(member => {
     if (hqMembers.includes(member) || mentors.includes(member)) return;
 
     if (!teamGroups[member.role]) {
@@ -87,12 +85,11 @@ export default async function TeamPage() {
     teamGroups[member.role].push(member);
   });
 
-  // Sort members within each team: Lead first, then Co-lead, then others
   Object.keys(teamGroups).forEach(team => {
     teamGroups[team].sort((a, b) => {
       const posA = a.position?.toLowerCase() || '';
       const posB = b.position?.toLowerCase() || '';
-      
+
       if (posA === 'lead') return -1;
       if (posB === 'lead') return 1;
       if (posA.includes('co-lead') || posA.includes('colead')) return -1;
@@ -100,6 +97,26 @@ export default async function TeamPage() {
       return 0;
     });
   });
+
+  const sortedTeamNames = Object.keys(teamGroups).sort((a, b) => {
+    if (a.toLowerCase() === 'technical') return -1;
+    if (b.toLowerCase() === 'technical') return 1;
+    return a.localeCompare(b);
+  });
+
+  return [
+    ...hqMembers,
+    ...mentors,
+    ...sortedTeamNames.flatMap(name => teamGroups[name]),
+  ];
+}
+
+export default async function TeamPage() {
+  const teamMembers = await getTeamMembers();
+
+  const isAlumni = (m: TeamMember) => (m.status || 'current').toLowerCase() === 'alumni';
+  const currentMembers = buildOrderedRoster(teamMembers.filter(m => !isAlumni(m)));
+  const alumniMembers = buildOrderedRoster(teamMembers.filter(isAlumni));
 
   return (
     <div className="relative min-h-screen text-white">
@@ -121,17 +138,17 @@ export default async function TeamPage() {
         {teamMembers.length === 0 ? (
           <div className="text-center py-20">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 mb-4">
-              <svg 
-                className="w-8 h-8 text-gray-400" 
-                fill="none" 
-                stroke="currentColor" 
+              <svg
+                className="w-8 h-8 text-gray-400"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" 
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                 />
               </svg>
             </div>
@@ -141,18 +158,7 @@ export default async function TeamPage() {
             </p>
           </div>
         ) : (
-          <TeamMembersGrid
-            hqMembers={hqMembers}
-            mentors={mentors}
-            teamGroups={teamGroups}
-            sortedTeamNames={Object.keys(teamGroups).sort((a, b) => {
-              // Technical team first
-              if (a.toLowerCase() === 'technical') return -1;
-              if (b.toLowerCase() === 'technical') return 1;
-              // Then alphabetically
-              return a.localeCompare(b);
-            })}
-          />
+          <TeamCarousel currentMembers={currentMembers} alumniMembers={alumniMembers} />
         )}
       </div>
 

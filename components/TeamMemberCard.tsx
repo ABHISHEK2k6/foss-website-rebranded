@@ -34,15 +34,14 @@ interface TeamMemberCardProps {
     github?: string;
   };
   index: number;
-  size?: 'small' | 'medium' | 'large';
   priority?: boolean;
   // Called once this card's image has either loaded, failed, or was never
-  // there to begin with — lets a parent (e.g. TeamMembersGrid) know when it's
+  // there to begin with — lets a parent (e.g. TeamCarousel) know when it's
   // safe to stop covering the page with a loading screen.
   onSettle?: () => void;
 }
 
-export default function TeamMemberCard({ member, index, size = 'small', priority = false, onSettle }: TeamMemberCardProps) {
+export default function TeamMemberCard({ member, index, priority = false, onSettle }: TeamMemberCardProps) {
   const [imageError, setImageError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -53,59 +52,73 @@ export default function TeamMemberCard({ member, index, size = 'small', priority
   }, [member.image]);
 
   const isHQ = member.role?.toLowerCase() === 'hq';
-
-  const sizeClasses = {
-    small: 'aspect-[3/4]',
-    medium: 'aspect-square',
-    large: 'aspect-[4/3]'
-  };
+  const hasLink = Boolean(member.linkedin || member.instagram || member.github);
 
   return (
     <>
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: index * 0.02 }}
-        className="group relative bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10 hover:border-white/30 hover:bg-white/10 transition-colors duration-300 cursor-pointer"
-        onClick={() => setIsModalOpen(true)}
-        onMouseEnter={() => preloadImage(member.image)}
-        onTouchStart={() => preloadImage(member.image)}
+        transition={{ duration: 0.3, delay: (index % 4) * 0.05 }}
+        className="group flex h-full flex-col bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 hover:border-blue-400/40 hover:bg-white/10 transition-colors duration-300"
       >
-      <div className={`relative w-full ${sizeClasses[size]} overflow-hidden`}>
-        {member.image && !imageError ? (
-          <Image
-            src={member.image}
-            alt={member.name}
-            fill
-            sizes="(max-width: 639px) 100vw, 256px"
-            className="object-cover group-hover:scale-110 transition-transform duration-300"
-            onLoad={() => onSettle?.()}
-            onError={() => {
-              setImageError(true);
-              onSettle?.();
-            }}
-            priority={priority}
-            loading={priority ? undefined : 'eager'}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-purple-600 to-blue-600">
-            <span className="text-6xl font-bold text-white">
-              {member.name.charAt(0).toUpperCase()}
+        <div
+          className="relative w-full aspect-square overflow-hidden cursor-pointer"
+          onClick={() => setIsModalOpen(true)}
+          onMouseEnter={() => preloadImage(member.image)}
+          onTouchStart={() => preloadImage(member.image)}
+        >
+          {!hasLink && (
+            <span className="absolute top-3 left-3 z-10 rounded-full bg-orange-500 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">
+              No Link
             </span>
+          )}
+          {member.image && !imageError ? (
+            <Image
+              src={member.image}
+              alt={member.name}
+              fill
+              sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 25vw"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              onLoad={() => onSettle?.()}
+              onError={() => {
+                setImageError(true);
+                onSettle?.();
+              }}
+              priority={priority}
+              loading={priority ? undefined : 'eager'}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-blue-600 to-purple-600">
+              <span className="text-6xl font-bold text-white">
+                {member.name.charAt(0).toUpperCase()}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-1 flex-col p-3">
+          <div className="flex-1">
+            <h3 className="text-base font-bold text-white truncate">
+              {member.name}
+            </h3>
+            <p className="mt-1 text-xs font-medium uppercase tracking-wide text-gray-400 truncate">
+              {!isHQ && member.role && `${member.role} `}
+              {member.position || 'Member'}
+            </p>
           </div>
-        )}
-        {/* <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div> */}
-      </div>
-      
-      <div className="p-4 text-center">
-        <h3 className="text-lg font-bold mb-1 group-hover:text-gray-300 transition-colors">
-          {member.name}
-        </h3>
-        <p className="text-white text-sm font-medium">
-          {!isHQ && member.role && `${member.role} `}
-          {member.position || 'Member'}
-        </p>
-      </div>
+
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
+          >
+            Connect
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </button>
+        </div>
       </motion.div>
 
       <TeamMemberModal

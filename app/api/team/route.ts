@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server';
 
-// Was force-dynamic + no-store, meaning every single page view re-fetched
-// from the Google Sheets API from scratch (multi-second round-trips observed).
-// The roster doesn't change minute-to-minute, so a short revalidation window
-// lets Next cache the response and serve near-instantly, only going back to
-// Sheets in the background once the window has passed.
-export const revalidate = 60;
+// Fully dynamic: every request re-fetches from Google Sheets, so a sheet
+// edit shows up on the very next page load instead of waiting out a shared
+// cache window.
+export const dynamic = 'force-dynamic';
 
 interface TeamMember {
   image: string;
@@ -18,6 +16,7 @@ interface TeamMember {
   instagram?: string;
   linkedin?: string;
   github?: string;
+  status?: string;
 }
 
 // Convert Google Drive sharing link to direct image link
@@ -58,13 +57,13 @@ export async function GET() {
     }
 
     // Fetch data from Google Sheets
-    // Sheet structure: Timestamp, Name, Team, Position, Year, Department, DOB, Email, Mobile, Instagram, LinkedIn, GitHub, Photo
-    // Columns: A=Timestamp, B=Name, C=Team, D=Position, E=Year, F=Department, G=DOB, H=Email, I=Mobile, J=Instagram, K=LinkedIn, L=GitHub, M=Photo
-    const range = "'Team'!A2:M"; // Skip header row, get all columns
+    // Sheet structure: Timestamp, Name, Team, Position, Year, Department, DOB, Email, Mobile, Instagram, LinkedIn, GitHub, Photo, Status
+    // Columns: A=Timestamp, B=Name, C=Team, D=Position, E=Year, F=Department, G=DOB, H=Email, I=Mobile, J=Instagram, K=LinkedIn, L=GitHub, M=Photo, N=Status (Current/Alumni)
+    const range = "'Team'!A2:N"; // Skip header row, get all columns
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(range)}?key=${apiKey}`;
 
     const response = await fetch(url, {
-      next: { revalidate: 60 }
+      cache: 'no-store'
     });
 
     if (!response.ok) {
@@ -80,8 +79,8 @@ export async function GET() {
     const rows = data.values || [];
 
     // Transform the data - Map columns correctly
-    // [0]=Timestamp, [1]=Name, [2]=Team, [3]=Position, [4]=Year, [5]=Department, 
-    // [6]=DOB, [7]=Email, [8]=Mobile, [9]=Instagram, [10]=LinkedIn, [11]=GitHub, [12]=Photo
+    // [0]=Timestamp, [1]=Name, [2]=Team, [3]=Position, [4]=Year, [5]=Department,
+    // [6]=DOB, [7]=Email, [8]=Mobile, [9]=Instagram, [10]=LinkedIn, [11]=GitHub, [12]=Photo, [13]=Status
     const teamMembers: TeamMember[] = rows
       .filter((row: string[]) => row.length >= 2) // At least name
       .map((row: string[]) => ({
@@ -95,17 +94,16 @@ export async function GET() {
         instagram: row[9] || undefined,
         linkedin: row[10] || undefined,
         github: row[11] || undefined,
+        // Anything other than an explicit "alumni" is treated as current, so
+        // existing rows with no Status filled in yet still show up correctly.
+        status: (row[13] || '').trim().toLowerCase() === 'alumni' ? 'alumni' : 'current',
       }));
 
     return NextResponse.json(
       { success: true, data: teamMembers },
       {
         headers: {
-          // Cached for 60s; stale-while-revalidate lets Next serve the (slightly
-          // stale) cached copy instantly for up to 5 more minutes while it
-          // refetches in the background, instead of every visitor waiting on
-          // a fresh Google Sheets round-trip.
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+          'Cache-Control': 'no-store, must-revalidate',
         }
       }
     );
